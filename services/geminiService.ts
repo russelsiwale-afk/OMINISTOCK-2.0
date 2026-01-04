@@ -1,23 +1,27 @@
 
 import { GoogleGenAI, Type, GenerateContentResponse, Modality } from "@google/genai";
 
+const API_KEY = process.env.API_KEY || "";
+
+export const getGeminiPro = () => new GoogleGenAI({ apiKey: API_KEY });
+
 /**
- * Standard text tasks (summaries, fast Q&A)
+ * Basic Business Advisory using Gemini 3 Flash (Fast)
  */
-export async function getFastBusinessAdvice(prompt: string): Promise<string> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+export async function getFastBusinessAdvice(prompt: string) {
+  const ai = getGeminiPro();
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: prompt,
   });
-  return response.text ?? "I'm sorry, I couldn't generate a response at this time.";
+  return response.text;
 }
 
 /**
- * Deep strategic analysis with Thinking Budget
+ * Complex Business Analysis with Thinking Mode
  */
-export async function getDeepBusinessAnalysis(prompt: string): Promise<string> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+export async function getDeepBusinessAnalysis(prompt: string) {
+  const ai = getGeminiPro();
   const response = await ai.models.generateContent({
     model: "gemini-3-pro-preview",
     contents: prompt,
@@ -25,14 +29,14 @@ export async function getDeepBusinessAnalysis(prompt: string): Promise<string> {
       thinkingConfig: { thinkingBudget: 32768 }
     },
   });
-  return response.text ?? "Strategic analysis failed to generate. Please try again.";
+  return response.text;
 }
 
 /**
- * Real-time Market Search
+ * Grounded Search for Market Trends
  */
-export async function getMarketSearch(query: string): Promise<{ text: string; sources: any[] }> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+export async function getMarketSearch(query: string) {
+  const ai = getGeminiPro();
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: query,
@@ -41,56 +45,33 @@ export async function getMarketSearch(query: string): Promise<{ text: string; so
     },
   });
   return {
-    text: response.text ?? "No search results found.",
+    text: response.text,
     sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks || []
   };
 }
 
 /**
- * Professional Image Generation (Gemini 3 Pro)
- * Follows mandatory key selection flow
+ * Product Image Generation
  */
-export async function generateProductImage(
-  prompt: string, 
-  aspectRatio: "1:1" | "2:3" | "3:2" | "3:4" | "4:3" | "9:16" | "16:9" | "21:9" = "1:1", 
-  size: "1K" | "2K" | "4K" = "1K"
-): Promise<string | null> {
-  // 1. Mandatory API key selection check
-  const win = window as any;
-  if (win.aistudio) {
-    const hasKey = await win.aistudio.hasSelectedApiKey();
-    if (!hasKey) {
-      await win.aistudio.openSelectKey();
-      // Proceed immediately as per race condition rules
-    }
-  }
-
-  // 2. New instance right before the call
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
-  
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-image-preview',
-      contents: { parts: [{ text: prompt }] },
-      config: {
-        imageConfig: {
-          aspectRatio: aspectRatio,
-          imageSize: size
-        }
-      },
-    });
-    
-    // Find image part
-    for (const part of response.candidates?.[0]?.content?.parts || []) {
-      if (part.inlineData) {
-        return `data:image/png;base64,${part.inlineData.data}`;
+export async function generateProductImage(prompt: string, aspectRatio: string = "1:1", size: string = "1K") {
+  // Requirement: Check if user has selected key for Pro models if needed
+  // For this implementation, we assume environment key is valid as per instructions.
+  const ai = getGeminiPro();
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-pro-image-preview',
+    contents: { parts: [{ text: prompt }] },
+    config: {
+      imageConfig: {
+        aspectRatio: aspectRatio as any,
+        imageSize: size as any
       }
+    },
+  });
+  
+  for (const part of response.candidates?.[0]?.content?.parts || []) {
+    if (part.inlineData) {
+      return `data:image/png;base64,${part.inlineData.data}`;
     }
-  } catch (error: any) {
-    if (error.message?.includes("Requested entity was not found")) {
-      if (win.aistudio) await win.aistudio.openSelectKey();
-    }
-    throw error;
   }
   return null;
 }

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   LayoutDashboard, 
   Package, 
@@ -7,9 +7,17 @@ import {
   Calculator, 
   Settings, 
   MessageSquare, 
+  TrendingUp, 
   AlertCircle,
   Menu,
-  X
+  X,
+  Plus,
+  Search,
+  Download,
+  BarChart3,
+  DollarSign,
+  Users,
+  Box
 } from 'lucide-react';
 import { Product, Sale, Expense, BusinessSettings, UserRole } from './types';
 import { INITIAL_PRODUCTS, INITIAL_EXPENSES, DEFAULT_SETTINGS } from './constants';
@@ -22,52 +30,18 @@ import SettingsPanel from './components/SettingsPanel';
 
 type Tab = 'dashboard' | 'inventory' | 'sales' | 'accounting' | 'ai' | 'settings';
 
-const APP_LOGO = "https://raw.githubusercontent.com/stackblitz/stackblitz-images/main/omnistock-logo.png";
-
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
-  // Persistent State Initialization
-  const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('omnistock_products');
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
-  });
+  // App State
+  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [sales, setSales] = useState<Sale[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>(INITIAL_EXPENSES);
+  const [settings, setSettings] = useState<BusinessSettings>(DEFAULT_SETTINGS);
+  const [currentUser, setCurrentUser] = useState({ role: UserRole.ADMIN, name: 'Alex Admin' });
 
-  const [sales, setSales] = useState<Sale[]>(() => {
-    const saved = localStorage.getItem('omnistock_sales');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [expenses, setExpenses] = useState<Expense[]>(() => {
-    const saved = localStorage.getItem('omnistock_expenses');
-    return saved ? JSON.parse(saved) : INITIAL_EXPENSES;
-  });
-
-  const [settings, setSettings] = useState<BusinessSettings>(() => {
-    const saved = localStorage.getItem('omnistock_settings');
-    return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
-  });
-
-  const [currentUser] = useState({ role: UserRole.ADMIN, name: 'Alex Admin' });
-
-  // Persistence Syncing
-  useEffect(() => {
-    localStorage.setItem('omnistock_products', JSON.stringify(products));
-  }, [products]);
-
-  useEffect(() => {
-    localStorage.setItem('omnistock_sales', JSON.stringify(sales));
-  }, [sales]);
-
-  useEffect(() => {
-    localStorage.setItem('omnistock_expenses', JSON.stringify(expenses));
-  }, [expenses]);
-
-  useEffect(() => {
-    localStorage.setItem('omnistock_settings', JSON.stringify(settings));
-  }, [settings]);
-
+  // Navigation Items Categorization
   const mainNavItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'inventory', label: 'Inventory', icon: Package },
@@ -88,7 +62,7 @@ const App: React.FC = () => {
   `;
 
   return (
-    <div className={`min-h-screen flex ${settings.preferences.darkMode ? 'dark bg-slate-900 text-white' : 'bg-slate-50 text-slate-900'}`}>
+    <div className={`min-h-screen flex ${settings.preferences.darkMode ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-900'}`}>
       
       {/* Sidebar */}
       <aside className={`
@@ -99,13 +73,11 @@ const App: React.FC = () => {
         <div className="p-4 flex items-center justify-between mb-4 flex-shrink-0">
           {isSidebarOpen ? (
             <div className="flex items-center gap-2">
-              <div className="bg-white rounded-xl p-1 shadow-sm">
-                <img src={APP_LOGO} className="w-8 h-8 object-contain" alt="Omnistock Logo" />
-              </div>
-              <span className="font-black text-xl tracking-tight bg-gradient-to-r from-blue-700 via-blue-800 to-green-600 bg-clip-text text-transparent">Omnistock</span>
+              <img src="./logo.png" className="w-10 h-10 object-contain rounded-lg" alt="Logo" />
+              <span className="font-black text-xl tracking-tight bg-gradient-to-r from-blue-700 to-green-600 bg-clip-text text-transparent">Omnistock</span>
             </div>
           ) : (
-            <img src={APP_LOGO} className="w-10 h-10 object-contain mx-auto" alt="Logo" />
+            <img src="./logo.png" className="w-10 h-10 object-contain mx-auto" alt="Logo" />
           )}
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
@@ -115,19 +87,33 @@ const App: React.FC = () => {
           </button>
         </div>
 
+        {/* Navigation Content */}
         <div className="flex-1 overflow-y-auto px-3 flex flex-col no-scrollbar">
+          {/* Main Operational Section */}
           <nav className="space-y-2">
             {mainNavItems.map((item) => (
-              <button key={item.id} onClick={() => setActiveTab(item.id as Tab)} className={navItemClass(item.id)}>
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id as Tab)}
+                className={navItemClass(item.id)}
+              >
                 <item.icon size={22} />
                 {isSidebarOpen && <span className="font-medium">{item.label}</span>}
               </button>
             ))}
           </nav>
+
+          {/* Spacer to push lower tools down */}
           <div className="flex-1 min-h-[60px]"></div>
+
+          {/* System & Support Section */}
           <div className="pt-4 border-t border-slate-100 dark:border-slate-700 space-y-3 pb-6">
             {systemNavItems.map((item) => (
-              <button key={item.id} onClick={() => setActiveTab(item.id as Tab)} className={navItemClass(item.id)}>
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id as Tab)}
+                className={navItemClass(item.id)}
+              >
                 <item.icon size={22} />
                 {isSidebarOpen && <span className="font-medium">{item.label}</span>}
               </button>
@@ -135,6 +121,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
+        {/* User Profile Section at bottom */}
         <div className="p-4 border-t border-slate-100 dark:border-slate-700 flex-shrink-0">
           <div className={`
             flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer
@@ -144,7 +131,7 @@ const App: React.FC = () => {
             {isSidebarOpen && (
               <div className="flex flex-col overflow-hidden">
                 <span className="text-sm font-bold truncate text-slate-900 dark:text-white">{currentUser.name}</span>
-                <span className="text-[11px] text-indigo-600 font-semibold uppercase tracking-wider truncate">{UserRole.ADMIN}</span>
+                <span className="text-[11px] text-indigo-600 font-semibold uppercase tracking-wider truncate">{currentUser.role}</span>
               </div>
             )}
           </div>
@@ -153,6 +140,7 @@ const App: React.FC = () => {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Header */}
         <header className="h-16 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-6 flex items-center justify-between flex-shrink-0">
           <h2 className="text-lg font-semibold">
             {activeTab === 'dashboard' && 'Business Intelligence'}
@@ -175,13 +163,26 @@ const App: React.FC = () => {
           </div>
         </header>
 
+        {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 no-scrollbar">
-          {activeTab === 'dashboard' && <Dashboard products={products} sales={sales} expenses={expenses} settings={settings} />}
-          {activeTab === 'inventory' && <Inventory products={products} setProducts={setProducts} settings={settings} />}
-          {activeTab === 'sales' && <Sales products={products} setProducts={setProducts} sales={sales} setSales={setSales} settings={settings} />}
-          {activeTab === 'accounting' && <Accounting sales={sales} expenses={expenses} setExpenses={setExpenses} products={products} settings={settings} />}
-          {activeTab === 'ai' && <AIAdvisor products={products} sales={sales} expenses={expenses} settings={settings} />}
-          {activeTab === 'settings' && <SettingsPanel settings={settings} setSettings={setSettings} />}
+          {activeTab === 'dashboard' && (
+            <Dashboard products={products} sales={sales} expenses={expenses} settings={settings} />
+          )}
+          {activeTab === 'inventory' && (
+            <Inventory products={products} setProducts={setProducts} settings={settings} />
+          )}
+          {activeTab === 'sales' && (
+            <Sales products={products} setProducts={setProducts} sales={sales} setSales={setSales} settings={settings} />
+          )}
+          {activeTab === 'accounting' && (
+            <Accounting sales={sales} expenses={expenses} setExpenses={setExpenses} products={products} settings={settings} />
+          )}
+          {activeTab === 'ai' && (
+            <AIAdvisor products={products} sales={sales} expenses={expenses} settings={settings} />
+          )}
+          {activeTab === 'settings' && (
+            <SettingsPanel settings={settings} setSettings={setSettings} />
+          )}
         </div>
       </main>
     </div>

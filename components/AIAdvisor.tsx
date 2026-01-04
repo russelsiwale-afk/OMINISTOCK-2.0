@@ -1,8 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Sparkles, Send, BrainCircuit, Mic, Image as ImageIcon, 
-  RefreshCcw, Bot, User, Volume2, Globe
+  Sparkles, Send, BrainCircuit, Search, MapPin, Mic, Video, Image as ImageIcon, 
+  RefreshCcw, ChevronRight, BarChart, Bot, User, Volume2, Globe
 } from 'lucide-react';
 import { Product, Sale, Expense, BusinessSettings } from '../types';
 import { getFastBusinessAdvice, getDeepBusinessAnalysis, getMarketSearch, generateProductImage } from '../services/geminiService';
@@ -56,7 +56,7 @@ const AIAdvisor: React.FC<AIAdvisorProps> = ({ products, sales, expenses, settin
 
       setMessages(prev => [...prev, { role: 'ai', content: response, type }]);
     } catch (err) {
-      setMessages(prev => [...prev, { role: 'ai', content: "I'm sorry, I encountered an error. Please ensure your API key is configured correctly in Vercel settings." }]);
+      setMessages(prev => [...prev, { role: 'ai', content: "I'm sorry, I encountered an error. Please try again." }]);
     } finally {
       setIsLoading(false);
     }
