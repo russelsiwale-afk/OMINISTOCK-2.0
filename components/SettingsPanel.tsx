@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { 
   User, Shield, CreditCard, Box, Bell, Smartphone, Globe, Moon, Save, 
-  Trash2, Plus, Mail, ChevronRight, Info, Zap, Receipt, Layout, AlignCenter, AlignLeft, AlignRight, FileText
+  Plus, Receipt, Zap, AlignCenter, AlignLeft, AlignRight
 } from 'lucide-react';
 import { BusinessSettings } from '../types';
 
@@ -76,24 +76,24 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) 
               <SettingInput 
                 label="Business Trading Name" 
                 value={settings.profile.name} 
-                onChange={v => updateSetting('profile', 'name', v)} 
+                onChange={(v: string) => updateSetting('profile', 'name', v)} 
               />
               <SettingInput 
                 label="Business Category" 
                 value={settings.profile.type} 
-                onChange={v => updateSetting('profile', 'type', v)} 
+                onChange={(v: string) => updateSetting('profile', 'type', v)} 
               />
               <div className="col-span-1 sm:col-span-2">
                 <SettingInput 
                   label="Registered Physical Address" 
                   value={settings.profile.address} 
-                  onChange={v => updateSetting('profile', 'address', v)} 
+                  onChange={(v: string) => updateSetting('profile', 'address', v)} 
                 />
               </div>
               <SettingInput 
                 label="Primary Contact Number" 
                 value={settings.profile.contact} 
-                onChange={v => updateSetting('profile', 'contact', v)} 
+                onChange={(v: string) => updateSetting('profile', 'contact', v)} 
               />
             </div>
           </div>
@@ -113,7 +113,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) 
               <SettingInput 
                 label="Document Header Title" 
                 value={settings.receipt.title} 
-                onChange={v => updateSetting('receipt', 'title', v)} 
+                onChange={(v: string) => updateSetting('receipt', 'title', v)} 
                 placeholder="e.g. TAX INVOICE"
               />
               
@@ -165,11 +165,11 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-700">
                   <span className="text-sm font-black text-slate-700 dark:text-slate-300">Staff Attribution</span>
-                  <Toggle checked={settings.receipt.showStaff} onChange={v => updateSetting('receipt', 'showStaff', v)} />
+                  <Toggle checked={settings.receipt.showStaff} onChange={(v: boolean) => updateSetting('receipt', 'showStaff', v)} />
                 </div>
                 <div className="flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-700">
                   <span className="text-sm font-black text-slate-700 dark:text-slate-300">Itemized Barcodes</span>
-                  <Toggle checked={settings.receipt.showBarcode} onChange={v => updateSetting('receipt', 'showBarcode', v)} />
+                  <Toggle checked={settings.receipt.showBarcode} onChange={(v: boolean) => updateSetting('receipt', 'showBarcode', v)} />
                 </div>
               </div>
             </div>
@@ -197,13 +197,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) 
                 label="Standard VAT / Tax Rate (%)" 
                 type="number"
                 value={settings.financial.taxRate.toString()} 
-                onChange={v => updateSetting('financial', 'taxRate', Number(v))} 
+                onChange={(v: string) => updateSetting('financial', 'taxRate', Number(v))} 
               />
               <div className="sm:col-span-2">
                 <SettingInput 
                   label="Fiscal Year Reporting Start" 
                   value={settings.financial.fiscalYearStart} 
-                  onChange={v => updateSetting('financial', 'fiscalYearStart', v)} 
+                  onChange={(v: string) => updateSetting('financial', 'fiscalYearStart', v)} 
                 />
               </div>
             </div>
@@ -224,7 +224,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) 
                 </div>
                 <Toggle 
                   checked={settings.ai.enabled} 
-                  onChange={v => updateSetting('ai', 'enabled', v)} 
+                  onChange={(v: boolean) => updateSetting('ai', 'enabled', v)} 
                 />
               </div>
               <div>
@@ -273,7 +273,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) 
                 </div>
                 <Toggle 
                   checked={settings.preferences.darkMode} 
-                  onChange={v => updateSetting('preferences', 'darkMode', v)} 
+                  onChange={(v: boolean) => updateSetting('preferences', 'darkMode', v)} 
                 />
               </div>
             </div>
