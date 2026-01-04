@@ -1,0 +1,9 @@
+{
+  "name": "Omnistock: AI Business Intelligence",
+  "description": "An enterprise-grade, AI-driven business management suite for inventory, sales tracking, accounting, and strategic advisory. Built for growth.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
